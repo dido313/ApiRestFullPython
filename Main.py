@@ -115,11 +115,6 @@ def atualizar_dados(id):
 def alterar_cadastro_existente(id):
     if request.is_json:
         data = request.get_json()
-        is_valid, error_message = validar_dados(data)
-
-        if not is_valid:
-            return jsonify({"erro": error_message}), 400
-
         nome = data.get("nome")
         idade = data.get("idade")
         sexo = data.get("sexo")
@@ -130,14 +125,14 @@ def alterar_cadastro_existente(id):
          execute_query(query_update, values_update)
          return jsonify({"mensagem": "Nome atualizado com sucesso!"}), 200
         
-        if "idade" in data and data["nome"]:
+        if "idade" in data and data["idade"]:
          validar_idade(data)
          query_update = "UPDATE pessoas SET idade = %s WHERE id = %s"                                             #, idade = %s, sexo = %s WHERE id = %s
          values_update = (idade, id)
          execute_query(query_update, values_update)
          return jsonify({"mensagem": "Idade atualizada com sucesso!"}), 200
         
-        if "sexo" in data and data["nome"]:
+        if "sexo" in data and data["sexo"]:
          validar_sexo(data)
          query_update = "UPDATE pessoas SET sexo = %s WHERE id = %s"                                             #, idade = %s, sexo = %s WHERE id = %s
          values_update = (sexo, id)
