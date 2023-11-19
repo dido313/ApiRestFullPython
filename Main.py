@@ -1,6 +1,6 @@
 from flask import Flask, request, jsonify
 from flask_cors import CORS
-from flask_jwt_extended import JWTManager, create_access_token, jwt_required, get_jwt_identity
+#from flask_jwt_extended import JWTManager, create_access_token, jwt_required, get_jwt_identity
 import mysql.connector
 
 app = Flask(__name__)
@@ -16,7 +16,7 @@ db_config = {
 }
 
 app.config["JWT_SECRET_KEY"] = "3g4q^uPz#2!vL9&y8*xBs@6rWpCmEhA1"  
-jwt = JWTManager(app)
+#jwt = JWTManager(app)
 con = mysql.connector.connect(**db_config)
 
 def validar_nome(data):
@@ -65,14 +65,14 @@ def execute_query(query, values=None, fetchall=False):
         cursor.close()
 
 @app.route('/api/cadastros', methods=['GET'])
-@jwt_required()
+#@jwt_required()
 def obter_dados_exemplo():
     query = "SELECT * FROM view_cadastros"
     result = execute_query(query, fetchall=True)
     return jsonify(result)
 
 @app.route('/api/enviar', methods=['POST'])
-@jwt_required()
+#@jwt_required()
 def receber_dados():
         data = request.get_json()
         nome = data.get("nome")
@@ -91,7 +91,7 @@ def receber_dados():
     
 
 @app.route('/api/enviar/<int:id>', methods=['PUT'])  
-@jwt_required()
+##@jwt_required()
 def atualizar_dados(id):
     data = request.get_json()
     nome = data.get("nome")
@@ -128,23 +128,30 @@ def alterar_cadastro_existente(id):
               query_update = "UPDATE pessoas SET nome = %s WHERE id = %s"
               values_update = (nome, id)
               execute_query(query_update, values_update)
-              return jsonify({"mensagem": "Dados inseridos com sucesso!"}), 201
              else :
-              return jsonify({"erro": error_message}), 400
+              return jsonify({"erro": "O campo 'nome' é obrigatório e deve ter entre 3 e 50 caracteres."}), 400
              
         
             
         if "idade" in data:
-             query_update = "UPDATE pessoas SET idade = %s WHERE id = %s"
-             values_update = (idade, id)
-             execute_query(query_update, values_update)
-             
+             is_valid, error_message = validar_idade(data)
+
+             if is_valid:
+              query_update = "UPDATE pessoas SET idade = %s WHERE id = %s"
+              values_update = (idade, id)
+              execute_query(query_update, values_update)
+             else :
+              return jsonify({"erro":"O campo 'idade' é obrigatório e deve ser um número inteiro positivo."}), 400
         
         if "sexo" in data :
-             query_update = "UPDATE pessoas SET sexo = %s WHERE id = %s"
-             values_update = (sexo, id)
-             execute_query(query_update, values_update)
+             is_valid, error_message = validar_sexo(data)
 
+             if is_valid:
+              query_update = "UPDATE pessoas SET sexo = %s WHERE id = %s"
+              values_update = (sexo, id)
+              execute_query(query_update, values_update)
+             else :
+              return jsonify({"erro": "O campo 'sexo' é obrigatório e deve ser 'M' (masculino) ou 'F' (feminino)."}), 400
         return jsonify({"mensagem": f"Dados do ID {id} atualizados com sucesso!"}), 200  
       
     else:
@@ -152,7 +159,7 @@ def alterar_cadastro_existente(id):
           
 
 @app.route('/api/excluir/<int:id>', methods=['DELETE'])   #testados
-@jwt_required()
+##@jwt_required()
 def excluir_cadastro(id):
     query_delete = "DELETE FROM pessoas WHERE id = %s"
     values_delete = (id,)
@@ -161,7 +168,7 @@ def excluir_cadastro(id):
     return jsonify({"mensagem": "Cadastro excluído com sucesso!"}), 200
 
 
-@app.route('/api/login', methods=['POST'])
+''' @app.route('/api/login', methods=['POST'])
 def login():
     if request.is_json:
         data = request.get_json()
@@ -174,7 +181,7 @@ def login():
         else:
             return jsonify({"erro": "Credenciais inválidas"}), 401
     else:
-        return jsonify({"erro": "A solicitação deve conter dados JSON"}), 400
+        return jsonify({"erro": "A solicitação deve conter dados JSON"}), 400 '''
 
 if __name__ == '__main__':
-    app.run()
+    app.run() 
