@@ -22,8 +22,8 @@ con = mysql.connector.connect(**db_config)
 def validar_nome(data):
     nome = data.get("nome")
 
-    if not nome or not isinstance(nome, str) or not 3 <= len(nome) <= 50:
-        return False, "O campo 'nome' é obrigatório e deve ter entre 3 e 50 caracteres."
+    if not nome or not isinstance(nome, str) or not 3 <= len(nome) <= 50 or not nome.isalpha():
+        return False, "O campo 'nome' é obrigatório e deve ter entre 3 e 50 caracteres, contendo apenas letras."
     
     return True, ""
 
@@ -44,14 +44,14 @@ def validar_dados(data):
     idade = data.get("idade")
     sexo = data.get("sexo")
 
-    if not nome or not isinstance(nome, str) or not 3 <= len(nome) <= 50:
-        return False, "O campo 'nome' é obrigatório e deve ter entre 3 e 50 caracteres."
+    if not nome or not isinstance(nome, str) or not 3 <= len(nome) <= 50 or not nome.isalpha():
+        return False, "O campo 'nome' é obrigatório e deve ter entre 3 e 50 caracteres, contendo apenas letras!"
 
     if not idade or not isinstance(idade, int) or idade <= 0:
-        return False, "O campo 'idade' é obrigatório e deve ser um número inteiro positivo."
+        return False, "O campo 'idade' é obrigatório e deve ser um número inteiro positivo!"
 
     if not sexo or not isinstance(sexo, str) or sexo not in ("M", "F"):
-        return False, "O campo 'sexo' é obrigatório e deve ser 'M' (masculino) ou 'F' (feminino)."
+        return False, "O campo 'sexo' é obrigatório e deve ser 'M' (masculino) ou 'F' (feminino)!"
 
     return True, ""
 
@@ -129,7 +129,7 @@ def alterar_cadastro_existente(id):
               values_update = (nome, id)
               execute_query(query_update, values_update)
              else :
-              return jsonify({"erro": "O campo 'nome' é obrigatório e deve ter entre 3 e 50 caracteres."}), 400
+              return jsonify({"erro": "O campo 'nome' é obrigatório e deve ter entre 3 e 50 caracteres, contendo apenas letras!"}), 400
              
         
             
