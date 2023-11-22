@@ -31,7 +31,12 @@ Enviar Dados do Usuário:
 Endpoint: /api/enviar (POST)
 
 • Descrição: Aceita e valida dados do usuário, inserindo-os no banco de dados.
-
+Exemplo de Solicitação PUT utilizando o Endpoint /api/enviar (POST):
+{
+    "nome": "Joao Carlos",
+    "idade": 25,
+    "sexo": "M"
+}
 
 
 Atualizar Dados do Usuário:
