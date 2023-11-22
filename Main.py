@@ -1,6 +1,6 @@
 from flask import Flask, request, jsonify
 from flask_cors import CORS
-#from flask_jwt_extended import JWTManager, create_access_token, jwt_required, get_jwt_identity
+from flask_jwt_extended import JWTManager, create_access_token, jwt_required, get_jwt_identity
 import mysql.connector
 
 app = Flask(__name__)
@@ -10,13 +10,13 @@ CORS(app)
 db_config = {
     "host": "localhost",
     "user": "root",
-    "password": "3694481",
-    "database": "cadastros",
+    "password": "DbPassword",
+    "database": "Database",
     "autocommit": True
 }
 
-app.config["JWT_SECRET_KEY"] = "3g4q^uPz#2!vL9&y8*xBs@6rWpCmEhA1"  
-#jwt = JWTManager(app)
+app.config["JWT_SECRET_KEY"] = "SuaPalavraSecretaAqui"  
+jwt = JWTManager(app)
 con = mysql.connector.connect(**db_config)
 
 def validar_nome(data):
@@ -65,14 +65,14 @@ def execute_query(query, values=None, fetchall=False):
         cursor.close()
 
 @app.route('/api/cadastros', methods=['GET'])
-#@jwt_required()
+@jwt_required()
 def obter_dados_exemplo():
     query = "SELECT * FROM view_cadastros"
     result = execute_query(query, fetchall=True)
     return jsonify(result)
 
 @app.route('/api/enviar', methods=['POST'])
-#@jwt_required()
+@jwt_required()
 def receber_dados():
         data = request.get_json()
         nome = data.get("nome")
@@ -91,7 +91,7 @@ def receber_dados():
     
 
 @app.route('/api/enviar/<int:id>', methods=['PUT'])  
-##@jwt_required()
+@jwt_required()
 def atualizar_dados(id):
     data = request.get_json()
     nome = data.get("nome")
@@ -158,8 +158,8 @@ def alterar_cadastro_existente(id):
         return jsonify({"erro": "A solicitação deve conter dados JSON"})
           
 
-@app.route('/api/excluir/<int:id>', methods=['DELETE'])   #testados
-##@jwt_required()
+@app.route('/api/excluir/<int:id>', methods=['DELETE'])  
+@jwt_required()
 def excluir_cadastro(id):
     query_delete = "DELETE FROM pessoas WHERE id = %s"
     values_delete = (id,)
@@ -168,20 +168,20 @@ def excluir_cadastro(id):
     return jsonify({"mensagem": "Cadastro excluído com sucesso!"}), 200
 
 
-''' @app.route('/api/login', methods=['POST'])
+@app.route('/api/login', methods=['POST'])
 def login():
     if request.is_json:
         data = request.get_json()
         username = data.get("username")  
         password = data.get("password") 
 
-        if username == "dido" and password == "123":
+        if username == "SeuLoginAqui" and password == "SuaSenhaAqui":
             access_token = create_access_token(identity=username)
             return jsonify(access_token=access_token), 200
         else:
             return jsonify({"erro": "Credenciais inválidas"}), 401
     else:
-        return jsonify({"erro": "A solicitação deve conter dados JSON"}), 400 '''
+        return jsonify({"erro": "A solicitação deve conter dados JSON"}), 400 
 
 if __name__ == '__main__':
     app.run() 
